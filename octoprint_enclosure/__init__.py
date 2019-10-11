@@ -342,7 +342,7 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
     def check_enclosure_temp(self):
         try:
             sensor_data = []
-            for sensor in list(filter(lambda item: item['input_type'] == 'temperature_sensor', self.rpi_inputs)):
+            for sensor in list(filter(lambda item: item['input_type'] == 'temperature_sensor', self.rpi_inputs)):                
                 temp, hum = self.get_sensor_data(sensor)
                 if  self._settings.get(["debug_temperature_log"]) is True:
                     self._logger.debug("Sensor %s Temperature: %s humidity %s", sensor['label'], temp, hum)
@@ -495,6 +495,7 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
 
     def get_sensor_data(self, sensor):
         try:
+            self.log_error("getting sensor data " + sensor['temp_name'] + sensor['humidity_name'])
             if self.development_mode:
                 temp, hum = self.read_dummy_temp()
             else:
