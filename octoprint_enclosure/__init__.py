@@ -520,7 +520,7 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
                     temp, hum = self.read_sensors_temp(sensor['temp_name'], sensor['humidity_name'])
                     
                 else:
-                    self._logger.info("temp_sensor_type no match '" + sensor['temp_sensor_type'] + "'")
+                    self._logger.info("temp_sensor_type no match")
                     temp = None
                     hum = None
             if temp != -1 and hum != -1:
