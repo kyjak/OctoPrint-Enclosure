@@ -495,7 +495,7 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
 
     def get_sensor_data(self, sensor):
         try:
-            self.log_error("getting sensor data ")
+            self._logger.warn("getting sensor data ")
             if self.development_mode:
                 temp, hum = self.read_dummy_temp()
             else:
