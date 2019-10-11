@@ -444,6 +444,8 @@ $(function () {
         input_pull_resistor: ko.observable("input_pull_up"),
         temp_sensor_type: ko.observable("DS18B20"),
         temp_sensor_address: ko.observable(""),
+        temp_name: ko.observable(""),
+        humidity_name: ko.observable(""),
         temp_sensor_temp: ko.observable(""),
         temp_sensor_humidity: ko.observable(""),
         ds18b20_serial: ko.observable(""),
