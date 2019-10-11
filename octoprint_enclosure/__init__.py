@@ -515,9 +515,8 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
                     temp = self.read_max31855_temp(sensor['temp_sensor_address'])
                     hum = 0
                 elif sensor['temp_sensor_type'] == "sensors":
-                    subprocess.Popen('echo 2 > /tmp/enc', stdout=subprocess.PIPE, shell=True)
-                    (output, err) = p.communicate()
-                    p_status = p.wait()    
+                    self._logger.warn("sensors ")
+                    self._logger.warn(sensor['temp_name'] + sensor['humidity_name'])
                     temp, hum = self.read_sensors_temp(sensor['temp_name'], sensor['humidity_name'])
                     
                 else:
