@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from octoprint.events import eventManager, Events
 from octoprint.util import RepeatedTimer
 from subprocess import Popen, PIPE
+import subprocess
 from .ledstrip import LEDStrip
 import octoprint.plugin
 import RPi.GPIO as GPIO
@@ -512,8 +513,14 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
                 elif sensor['temp_sensor_type'] == "max31855":
                     temp = self.read_max31855_temp(sensor['temp_sensor_address'])
                     hum = 0
+                elif sensor['temp_sensor_type'] == "sensors":
+                    subprocess.Popen('echo 2 > /tmp/enc', stdout=subprocess.PIPE, shell=True)
+                    (output, err) = p.communicate()
+                    p_status = p.wait()    
+                    temp, hum = self.read_sensors_temp(sensor['temp_name'], sensor['humidity_name'])
+                    
                 else:
-                    self._logger.info("temp_sensor_type no match")
+                    self._logger.info("temp_sensor_type no match '" + sensor['temp_sensor_type'] + "'")
                     temp = None
                     hum = None
             if temp != -1 and hum != -1:
@@ -564,6 +571,27 @@ class EnclosurePlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplateP
             else:
                 sudo_str = ""
             cmd = sudo_str + "python " + script + str(sensor) + " " + str(pin)
+            if  self._settings.get(["debug_temperature_log"]) is True:
+                self._logger.debug("Temperature dht cmd: %s", cmd)
+            stdout = (Popen(cmd, shell=True, stdout=PIPE).stdout).read()
+            if  self._settings.get(["debug_temperature_log"]) is True:
+                self._logger.debug("Dht result: %s", stdout)
+            temp, hum = stdout.split("|")
+            return (self.to_float(temp.strip()), self.to_float(hum.strip()))
+        except Exception as ex:
+            self._logger.info(
+                "Failed to execute python scripts, try disabling use SUDO on advanced section of the plugin.")
+            self.log_error(ex)
+            return (0, 0)
+
+    def read_sensors_temp(self, temp_name, humidity_name):
+        try:
+            script = os.path.dirname(os.path.realpath(__file__)) + "/getSensors.py "
+            if self._settings.get(["use_sudo"]):
+                sudo_str = "sudo "
+            else:
+                sudo_str = ""
+            cmd = sudo_str + "python " + script + str(temp_name) + " " + str(humidity_name)
             if  self._settings.get(["debug_temperature_log"]) is True:
                 self._logger.debug("Temperature dht cmd: %s", cmd)
             stdout = (Popen(cmd, shell=True, stdout=PIPE).stdout).read()
